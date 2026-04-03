@@ -13,6 +13,7 @@ interface Props {
 const DjotTextPanel: Component<Props> = (props) => {
   let container!: HTMLDivElement;
   let view: EditorView;
+  let suppressChange = false;
 
   onMount(() => {
     view = new EditorView({
@@ -22,7 +23,7 @@ const DjotTextPanel: Component<Props> = (props) => {
           basicSetup,
           markdown(),
           EditorView.updateListener.of((update) => {
-            if (update.docChanged) {
+            if (update.docChanged && !suppressChange) {
               props.onChange(update.state.doc.toString());
             }
           }),
@@ -35,9 +36,11 @@ const DjotTextPanel: Component<Props> = (props) => {
   createEffect(() => {
     const newContent = props.content;
     if (view && view.state.doc.toString() !== newContent) {
+      suppressChange = true;
       view.dispatch({
         changes: { from: 0, to: view.state.doc.length, insert: newContent },
       });
+      suppressChange = false;
     }
   });
 

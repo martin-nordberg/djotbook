@@ -1,4 +1,4 @@
-import { Component, createSignal, For } from 'solid-js';
+import { Component, createSignal, For, onCleanup } from 'solid-js';
 import styles from './App.module.css';
 import DjotTextPanel from './components/panels/DjotTextPanel';
 import DjotHtmlPanel from './components/panels/DjotHtmlPanel';
@@ -8,6 +8,8 @@ interface DjotFile {
   name: string;
   path: string;
   content: string;
+  handle: any;
+  dirty: boolean;
 }
 
 let nextId = 1;
@@ -24,6 +26,8 @@ const App: Component = () => {
         types: [{ description: 'Djot files', accept: { 'text/plain': ['.djot'] } }],
         multiple: false,
       });
+      const permission = await handle.requestPermission({ mode: 'readwrite' });
+      if (permission !== 'granted') return;
       const file: File = await handle.getFile();
       const content = await file.text();
       const path = handle.name;
@@ -35,20 +39,40 @@ const App: Component = () => {
       }
 
       const id = nextId++;
-      setFiles(prev => [...prev, { id, name: file.name, path, content }]);
+      setFiles(prev => [...prev, { id, name: file.name, path, content, handle, dirty: false }]);
       setActiveId(id);
     } catch (err: any) {
       if (err?.name !== 'AbortError') console.error(err);
     }
   }
 
+  async function saveFile(id: number) {
+    const file = files().find(f => f.id === id);
+    if (!file || !file.dirty) return;
+    try {
+      const writable = await file.handle.createWritable();
+      await writable.write(file.content);
+      await writable.close();
+      setFiles(prev => prev.map(f => f.id === id ? { ...f, dirty: false } : f));
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  const autoSaveInterval = setInterval(() => {
+    files().filter(f => f.dirty).forEach(f => saveFile(f.id));
+  }, 60_000);
+
+  onCleanup(() => clearInterval(autoSaveInterval));
+
   function updateContent(content: string) {
     const id = activeId();
     if (id == null) return;
-    setFiles(prev => prev.map(f => f.id === id ? { ...f, content } : f));
+    setFiles(prev => prev.map(f => f.id === id ? { ...f, content, dirty: true } : f));
   }
 
-  function closeFile(id: number) {
+  async function closeFile(id: number) {
+    await saveFile(id);
     const list = files();
     const idx = list.findIndex(f => f.id === id);
     const next = list.length > 1
@@ -78,7 +102,7 @@ const App: Component = () => {
               classList={{ [styles.tabActive]: file.id === activeId() }}
               onClick={() => setActiveId(file.id)}
             >
-              <span class={styles.tabTitle}>{file.name}</span>
+              <span class={styles.tabTitle}>{file.name}{file.dirty ? ' *' : ''}</span>
               <button
                 class={styles.tabClose}
                 title="Close"
