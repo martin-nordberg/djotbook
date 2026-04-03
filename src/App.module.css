@@ -19,6 +19,16 @@
   border-bottom: 1px solid #3e3228;
 }
 
+.logoLink {
+  display: flex;
+  align-items: center;
+  opacity: 0.9;
+}
+
+.logoLink:hover {
+  opacity: 1;
+}
+
 .appName {
   font-size: 1.1rem;
   font-weight: 600;
@@ -40,6 +50,43 @@
 
 .openButton:hover {
   background: #8a7a68;
+}
+
+.openButton:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.openButton:disabled:hover {
+  background: #7a6a58;
+}
+
+.saveButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  margin-left: auto;
+  background: #7a6a58;
+  color: #f5f0e8;
+  border: 1px solid #3e3228;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.saveButton:hover {
+  background: #8a7a68;
+}
+
+.saveButton:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.saveButton:disabled:hover {
+  background: #7a6a58;
 }
 
 /* ── Tab bar ─────────────────────────────────────────── */

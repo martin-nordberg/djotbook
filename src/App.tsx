@@ -10,6 +10,7 @@ interface DjotFile {
   content: string;
   handle: any;
   dirty: boolean;
+  everSaved: boolean;
 }
 
 let nextId = 1;
@@ -17,8 +18,18 @@ let nextId = 1;
 const App: Component = () => {
   const [files, setFiles] = createSignal<DjotFile[]>([]);
   const [activeId, setActiveId] = createSignal<number | null>(null);
+  const [saving, setSaving] = createSignal(false);
 
   const activeFile = () => files().find(f => f.id === activeId()) ?? null;
+
+  const saveLabel = () => {
+    if (saving()) return 'Saving Changes \u2026';
+    const f = activeFile();
+    if (!f || !f.dirty && !f.everSaved) return 'No Changes to Save';
+    if (f.dirty && !f.everSaved) return 'Save Changes Automatically';
+    if (!f.dirty && f.everSaved) return 'All Changes Saved';
+    return 'Unsaved Changes Pending';
+  };
 
   async function openFile() {
     try {
@@ -26,8 +37,6 @@ const App: Component = () => {
         types: [{ description: 'Djot files', accept: { 'text/plain': ['.djot'] } }],
         multiple: false,
       });
-      const permission = await handle.requestPermission({ mode: 'readwrite' });
-      if (permission !== 'granted') return;
       const file: File = await handle.getFile();
       const content = await file.text();
       const path = handle.name;
@@ -39,7 +48,7 @@ const App: Component = () => {
       }
 
       const id = nextId++;
-      setFiles(prev => [...prev, { id, name: file.name, path, content, handle, dirty: false }]);
+      setFiles(prev => [...prev, { id, name: file.name, path, content, handle, dirty: false, everSaved: false }]);
       setActiveId(id);
     } catch (err: any) {
       if (err?.name !== 'AbortError') console.error(err);
@@ -49,13 +58,16 @@ const App: Component = () => {
   async function saveFile(id: number) {
     const file = files().find(f => f.id === id);
     if (!file || !file.dirty) return;
+    setSaving(true);
     try {
       const writable = await file.handle.createWritable();
       await writable.write(file.content);
       await writable.close();
-      setFiles(prev => prev.map(f => f.id === id ? { ...f, dirty: false } : f));
+      setFiles(prev => prev.map(f => f.id === id ? { ...f, dirty: false, everSaved: true } : f));
     } catch (err) {
       console.error(err);
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -85,12 +97,27 @@ const App: Component = () => {
   return (
     <div class={styles.app}>
       <nav class={styles.navbar}>
+        <a href="https://htmlpreview.github.io/?https://github.com/jgm/djot/blob/master/doc/syntax.html" target="_blank" rel="noreferrer" class={styles.logoLink}>
+          <img src="/src/assets/favicon.svg" alt="Djot syntax reference" width="24" height="24" />
+        </a>
         <span class={styles.appName}>DjotBook</span>
         <button class={styles.openButton} title="Open file" onClick={openFile}>
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
           </svg>
           Open
+        </button>
+        <button
+          class={styles.saveButton}
+          onClick={() => { const id = activeId(); if (id != null) saveFile(id); }}
+          disabled={saving() || !activeFile()?.dirty}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+            <polyline points="17 21 17 13 7 13 7 21"/>
+            <polyline points="7 3 7 8 15 8"/>
+          </svg>
+          {saveLabel()}
         </button>
       </nav>
 
