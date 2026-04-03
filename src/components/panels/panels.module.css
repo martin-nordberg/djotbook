@@ -1,0 +1,13 @@
+.panel {
+  flex: 1;
+  overflow: auto;
+  padding: 16px;
+  color: #2c2010;
+  background: #faf6ee;
+  font-size: 0.875rem;
+  font-family: monospace;
+}
+
+.panel + .panel {
+  border-left: 1px solid #c8bfaf;
+}

@@ -17,6 +17,9 @@
     "vite-plugin-solid": "^2.11.8"
   },
   "dependencies": {
+    "@codemirror/lang-markdown": "^6.5.0",
+    "@djot/djot": "0.3.2",
+    "codemirror": "^6.0.2",
     "solid-js": "^1.9.5"
   }
 }

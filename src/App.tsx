@@ -1,5 +1,7 @@
 import { Component, createSignal, For } from 'solid-js';
 import styles from './App.module.css';
+import DjotTextPanel from './components/panels/DjotTextPanel';
+import DjotHtmlPanel from './components/panels/DjotHtmlPanel';
 
 interface DjotFile {
   id: number;
@@ -38,6 +40,12 @@ const App: Component = () => {
     } catch (err: any) {
       if (err?.name !== 'AbortError') console.error(err);
     }
+  }
+
+  function updateContent(content: string) {
+    const id = activeId();
+    if (id == null) return;
+    setFiles(prev => prev.map(f => f.id === id ? { ...f, content } : f));
   }
 
   function closeFile(id: number) {
@@ -87,12 +95,15 @@ const App: Component = () => {
       </div>
 
       <div class={styles.panels}>
-        <div class={styles.panel}>
-          {activeFile() ? `Left: ${activeFile()!.path}` : ''}
-        </div>
-        <div class={styles.panel}>
-          {activeFile() ? `Right: ${activeFile()!.path}` : ''}
-        </div>
+        <DjotTextPanel
+          path={activeFile()?.path ?? ''}
+          content={activeFile()?.content ?? ''}
+          onChange={updateContent}
+        />
+        <DjotHtmlPanel
+          path={activeFile()?.path ?? ''}
+          content={activeFile()?.content ?? ''}
+        />
       </div>
     </div>
   );

@@ -14,9 +14,9 @@
   padding: 0 16px;
   height: 48px;
   flex-shrink: 0;
-  background-color: #1e1e2e;
-  color: #cdd6f4;
-  border-bottom: 1px solid #313244;
+  background-color: #5a4a3a;
+  color: #f5f0e8;
+  border-bottom: 1px solid #3e3228;
 }
 
 .appName {
@@ -30,16 +30,16 @@
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  background: #313244;
-  color: #cdd6f4;
-  border: 1px solid #45475a;
+  background: #7a6a58;
+  color: #f5f0e8;
+  border: 1px solid #3e3228;
   border-radius: 6px;
   font-size: 0.875rem;
   cursor: pointer;
 }
 
 .openButton:hover {
-  background: #45475a;
+  background: #8a7a68;
 }
 
 /* ── Tab bar ─────────────────────────────────────────── */
@@ -47,8 +47,8 @@
 .tabBar {
   display: flex;
   flex-shrink: 0;
-  background-color: #181825;
-  border-bottom: 1px solid #313244;
+  background-color: #e8e0d0;
+  border-bottom: 1px solid #c8bfaf;
   overflow-x: auto;
   min-height: 36px;
 }
@@ -61,24 +61,24 @@
   min-width: 0;
   max-width: 200px;
   height: 36px;
-  color: #6c7086;
+  color: #7a6a58;
   font-size: 0.8125rem;
   cursor: pointer;
-  border-right: 1px solid #313244;
+  border-right: 1px solid #c8bfaf;
   white-space: nowrap;
   user-select: none;
   flex-shrink: 0;
 }
 
 .tab:hover {
-  color: #cdd6f4;
-  background: #1e1e2e;
+  color: #3e3228;
+  background: #d8d0c0;
 }
 
 .tabActive {
-  color: #cdd6f4;
-  background: #1e1e2e;
-  border-top: 2px solid #89b4fa;
+  color: #3e3228;
+  background: #f5f0e8;
+  border-top: 2px solid #8a6a40;
 }
 
 .tabTitle {
@@ -103,7 +103,7 @@
 }
 
 .tabClose:hover {
-  background: #45475a;
+  background: #c8bfaf;
   opacity: 1;
 }
 
@@ -115,16 +115,3 @@
   overflow: hidden;
 }
 
-.panel {
-  flex: 1;
-  overflow: auto;
-  padding: 16px;
-  color: #cdd6f4;
-  background: #1e1e2e;
-  font-size: 0.875rem;
-  font-family: monospace;
-}
-
-.panel + .panel {
-  border-left: 1px solid #313244;
-}
