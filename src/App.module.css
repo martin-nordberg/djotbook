@@ -1,0 +1,130 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── Navbar ─────────────────────────────────────────── */
+
+.navbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  height: 48px;
+  flex-shrink: 0;
+  background-color: #1e1e2e;
+  color: #cdd6f4;
+  border-bottom: 1px solid #313244;
+}
+
+.appName {
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.openButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #313244;
+  color: #cdd6f4;
+  border: 1px solid #45475a;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.openButton:hover {
+  background: #45475a;
+}
+
+/* ── Tab bar ─────────────────────────────────────────── */
+
+.tabBar {
+  display: flex;
+  flex-shrink: 0;
+  background-color: #181825;
+  border-bottom: 1px solid #313244;
+  overflow-x: auto;
+  min-height: 36px;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  min-width: 0;
+  max-width: 200px;
+  height: 36px;
+  color: #6c7086;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  border-right: 1px solid #313244;
+  white-space: nowrap;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.tab:hover {
+  color: #cdd6f4;
+  background: #1e1e2e;
+}
+
+.tabActive {
+  color: #cdd6f4;
+  background: #1e1e2e;
+  border-top: 2px solid #89b4fa;
+}
+
+.tabTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tabClose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 3px;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.5;
+}
+
+.tabClose:hover {
+  background: #45475a;
+  opacity: 1;
+}
+
+/* ── Panels ──────────────────────────────────────────── */
+
+.panels {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.panel {
+  flex: 1;
+  overflow: auto;
+  padding: 16px;
+  color: #cdd6f4;
+  background: #1e1e2e;
+  font-size: 0.875rem;
+  font-family: monospace;
+}
+
+.panel + .panel {
+  border-left: 1px solid #313244;
+}
