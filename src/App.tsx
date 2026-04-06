@@ -1,9 +1,10 @@
-import { Component, createSignal, For, onCleanup } from 'solid-js';
+import { Component, createEffect, createSignal, For, onCleanup, Show } from 'solid-js';
 import { EditorView } from 'codemirror';
 import styles from './App.module.css';
 import DjotTextPanel from './components/panels/DjotTextPanel';
 import DjotHtmlPanel from './components/panels/DjotHtmlPanel';
 import { createScrollSync } from './components/panels/useScrollSync';
+import { saveHandle, loadHandle, saveRecent, loadRecent } from './fileHandles';
 
 interface DjotFile {
   id: number;
@@ -15,6 +16,7 @@ interface DjotFile {
   everSaved: boolean;
 }
 
+
 let nextId = 1;
 
 const App: Component = () => {
@@ -22,10 +24,15 @@ const App: Component = () => {
   const [files, setFiles] = createSignal<DjotFile[]>([]);
   const [activeId, setActiveId] = createSignal<number | null>(null);
   const [saving, setSaving] = createSignal(false);
+  const [recentFiles, setRecentFiles] = createSignal<string[]>([]);
+  loadRecent().then(setRecentFiles);
+  const [openMenuOpen, setOpenMenuOpen] = createSignal(false);
 
   let editorView: EditorView | null = null;
   let htmlPanelEl: HTMLDivElement | null = null;
   let scrollSyncCleanup: (() => void) | null = null;
+  let openMenuRef!: HTMLDivElement;
+  const recentHandles = new Map<string, any>();
 
   function initScrollSync() {
     scrollSyncCleanup?.();
@@ -36,6 +43,16 @@ const App: Component = () => {
   }
 
   onCleanup(() => scrollSyncCleanup?.());
+
+  // Close the open menu when clicking outside it
+  createEffect(() => {
+    if (!openMenuOpen()) return;
+    const handler = (e: MouseEvent) => {
+      if (!openMenuRef?.contains(e.target as Node)) setOpenMenuOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    onCleanup(() => document.removeEventListener('mousedown', handler));
+  });
 
   const activeFile = () => files().find(f => f.id === activeId()) ?? null;
 
@@ -48,28 +65,47 @@ const App: Component = () => {
     return 'Unsaved Changes Pending';
   };
 
-  async function openFile() {
+  async function openFromHandle(handle: any) {
+    const file: File = await handle.getFile();
+    const content = await file.text();
+    const name = file.name;
+    const existing = files().find(f => f.path === name);
+    if (existing) { setActiveId(existing.id); return; }
+    const id = nextId++;
+    setFiles(prev => [...prev, { id, name, path: name, content, handle, dirty: false, everSaved: false }]);
+    setActiveId(id);
+    recentHandles.set(name, handle);
+    saveHandle(name, handle);
+    const list = [name, ...recentFiles().filter(n => n !== name)].slice(0, 8);
+    setRecentFiles(list);
+    saveRecent(list);
+  }
+
+  async function browseFile() {
+    setOpenMenuOpen(false);
     try {
       const [handle] = await (window as any).showOpenFilePicker({
         types: [{ description: 'Djot files', accept: { 'text/plain': ['.djot'] } }],
         multiple: false,
       });
-      const file: File = await handle.getFile();
-      const content = await file.text();
-      const path = handle.name;
-
-      const existing = files().find(f => f.path === path);
-      if (existing) {
-        setActiveId(existing.id);
-        return;
-      }
-
-      const id = nextId++;
-      setFiles(prev => [...prev, { id, name: file.name, path, content, handle, dirty: false, everSaved: false }]);
-      setActiveId(id);
+      await openFromHandle(handle);
     } catch (err: any) {
       if (err?.name !== 'AbortError') console.error(err);
     }
+  }
+
+  async function openRecent(name: string) {
+    setOpenMenuOpen(false);
+    const existing = files().find(f => f.path === name);
+    if (existing) { setActiveId(existing.id); return; }
+    const handle = recentHandles.get(name) ?? await loadHandle(name);
+    if (handle) {
+      try {
+        const perm = await handle.requestPermission({ mode: 'readwrite' });
+        if (perm === 'granted') { await openFromHandle(handle); return; }
+      } catch {}
+    }
+    await browseFile();
   }
 
   async function saveFile(id: number) {
@@ -118,12 +154,33 @@ const App: Component = () => {
           <img src="/src/assets/favicon.svg" alt="Djot syntax reference" width="24" height="24" />
         </a>
         <span class={styles.appName}>DjotBook</span>
-        <button class={styles.openButton} title="Open file" onClick={openFile}>
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
-          </svg>
-          Open
-        </button>
+
+        <div class={styles.openMenu} ref={openMenuRef}>
+          <button class={styles.openButton} title="Open file" onClick={() => setOpenMenuOpen(v => !v)}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+            </svg>
+            Open
+          </button>
+          <Show when={openMenuOpen()}>
+            <div class={styles.openDropdown}>
+              <For each={recentFiles()}>
+                {(name) => (
+                  <button class={styles.openDropdownItem} onClick={() => openRecent(name)}>
+                    {name}
+                  </button>
+                )}
+              </For>
+              <Show when={recentFiles().length > 0}>
+                <div class={styles.openDropdownDivider} />
+              </Show>
+              <button class={styles.openDropdownItem} onClick={browseFile}>
+                Browse…
+              </button>
+            </div>
+          </Show>
+        </div>
+
         <button
           class={styles.saveButton}
           onClick={() => { const id = activeId(); if (id != null) saveFile(id); }}

@@ -35,6 +35,10 @@
   letter-spacing: 0.02em;
 }
 
+.openMenu {
+  position: relative;
+}
+
 .openButton {
   display: flex;
   align-items: center;
@@ -52,13 +56,42 @@
   background: #8a7a68;
 }
 
-.openButton:disabled {
-  opacity: 0.4;
-  cursor: default;
+.openDropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 200px;
+  background: #3e3228;
+  border: 1px solid #2a2018;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  overflow: hidden;
+  z-index: 100;
 }
 
-.openButton:disabled:hover {
-  background: #7a6a58;
+.openDropdownItem {
+  display: block;
+  width: 100%;
+  padding: 8px 14px;
+  background: none;
+  border: none;
+  color: #f5f0e8;
+  font-size: 0.875rem;
+  text-align: left;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.openDropdownItem:hover {
+  background: #5a4a3a;
+}
+
+.openDropdownDivider {
+  height: 1px;
+  background: #5a4a3a;
+  margin: 2px 0;
 }
 
 .saveButton {
