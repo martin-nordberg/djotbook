@@ -5,13 +5,14 @@ import styles from './panels.module.css';
 interface Props {
   path: string;
   content: string;
+  onPanelRef?: (el: HTMLDivElement) => void;
 }
 
 const DjotHtmlPanel: Component<Props> = (props) => {
-  const html = createMemo(() => renderHTML(parse(props.content)));
+  const html = createMemo(() => renderHTML(parse(props.content, { sourcePositions: true })));
 
   return (
-    <div class={styles.panel} innerHTML={html()} />
+    <div class={styles.panel} ref={props.onPanelRef} innerHTML={html()} />
   );
 };
 

@@ -1,7 +1,9 @@
 import { Component, createSignal, For, onCleanup } from 'solid-js';
+import { EditorView } from 'codemirror';
 import styles from './App.module.css';
 import DjotTextPanel from './components/panels/DjotTextPanel';
 import DjotHtmlPanel from './components/panels/DjotHtmlPanel';
+import { createScrollSync } from './components/panels/useScrollSync';
 
 interface DjotFile {
   id: number;
@@ -19,6 +21,20 @@ const App: Component = () => {
   const [files, setFiles] = createSignal<DjotFile[]>([]);
   const [activeId, setActiveId] = createSignal<number | null>(null);
   const [saving, setSaving] = createSignal(false);
+
+  let editorView: EditorView | null = null;
+  let htmlPanelEl: HTMLDivElement | null = null;
+  let scrollSyncCleanup: (() => void) | null = null;
+
+  function initScrollSync() {
+    scrollSyncCleanup?.();
+    scrollSyncCleanup = null;
+    if (editorView && htmlPanelEl) {
+      scrollSyncCleanup = createScrollSync(() => editorView, () => htmlPanelEl);
+    }
+  }
+
+  onCleanup(() => scrollSyncCleanup?.());
 
   const activeFile = () => files().find(f => f.id === activeId()) ?? null;
 
@@ -150,10 +166,12 @@ const App: Component = () => {
           path={activeFile()?.path ?? ''}
           content={activeFile()?.content ?? ''}
           onChange={updateContent}
+          onEditor={(view) => { editorView = view; initScrollSync(); }}
         />
         <DjotHtmlPanel
           path={activeFile()?.path ?? ''}
           content={activeFile()?.content ?? ''}
+          onPanelRef={(el) => { htmlPanelEl = el; initScrollSync(); }}
         />
       </div>
     </div>

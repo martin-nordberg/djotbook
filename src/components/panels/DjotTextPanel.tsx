@@ -8,6 +8,7 @@ interface Props {
   path: string;
   content: string;
   onChange: (content: string) => void;
+  onEditor?: (view: EditorView) => void;
 }
 
 const DjotTextPanel: Component<Props> = (props) => {
@@ -22,6 +23,7 @@ const DjotTextPanel: Component<Props> = (props) => {
         extensions: [
           basicSetup,
           markdown(),
+          EditorView.theme({ '&': { height: '100%' }, '.cm-scroller': { overflow: 'auto' } }),
           EditorView.updateListener.of((update) => {
             if (update.docChanged && !suppressChange) {
               props.onChange(update.state.doc.toString());
@@ -31,6 +33,7 @@ const DjotTextPanel: Component<Props> = (props) => {
       }),
       parent: container,
     });
+    props.onEditor?.(view);
   });
 
   createEffect(() => {
@@ -46,7 +49,7 @@ const DjotTextPanel: Component<Props> = (props) => {
 
   onCleanup(() => view?.destroy());
 
-  return <div class={styles.panel} ref={container} />;
+  return <div class={`${styles.panel} ${styles.panelText}`} ref={container} />;
 };
 
 export default DjotTextPanel;

@@ -1,5 +1,7 @@
 .panel {
   flex: 1;
+  height: 100%;
+  box-sizing: border-box;
   overflow: auto;
   padding: 16px;
   color: #2c2010;
@@ -8,6 +10,19 @@
   font-family: monospace;
 }
 
+/* Left (text) panel: CodeMirror manages its own scroll container */
+.panelText {
+  overflow: hidden;
+  padding: 0;
+}
+
+/* Right (preview) panel: programmatically scrolled, no visible scrollbar */
 .panel + .panel {
   border-left: 1px solid #c8bfaf;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.panel + .panel::-webkit-scrollbar {
+  display: none;
 }
