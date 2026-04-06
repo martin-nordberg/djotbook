@@ -12,7 +12,7 @@ const DjotHtmlPanel: Component<Props> = (props) => {
   const html = createMemo(() => renderHTML(parse(props.content, { sourcePositions: true })));
 
   return (
-    <div class={styles.panel} ref={props.onPanelRef} innerHTML={html()} />
+    <div class={`${styles.panel} ${styles.panelPreview}`} ref={props.onPanelRef} innerHTML={html()} />
   );
 };
 

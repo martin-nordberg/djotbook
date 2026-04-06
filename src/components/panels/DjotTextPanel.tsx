@@ -23,6 +23,7 @@ const DjotTextPanel: Component<Props> = (props) => {
         extensions: [
           basicSetup,
           markdown(),
+          EditorView.lineWrapping,
           EditorView.theme({ '&': { height: '100%' }, '.cm-scroller': { overflow: 'auto' } }),
           EditorView.updateListener.of((update) => {
             if (update.docChanged && !suppressChange) {

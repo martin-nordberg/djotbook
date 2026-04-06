@@ -49,6 +49,12 @@ export function createScrollSync(
     if (!view || !panelEl) return;
 
     const scrollTop = view.scrollDOM.scrollTop;
+
+    if (scrollTop === 0) {
+      panelEl.scrollTop = 0;
+      return;
+    }
+
     const block = view.lineBlockAtHeight(scrollTop);
     const anchors = getSortedAnchors(panelEl);
     const anchor = findAnchorForCmOffset(anchors, block.from);

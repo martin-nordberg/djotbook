@@ -157,8 +157,22 @@
 /* ── Panels ──────────────────────────────────────────── */
 
 .panels {
-  display: flex;
+  display: grid;
+  grid-template-columns: var(--split-left, 50%) 5px minmax(0, 1fr);
   flex: 1;
   overflow: hidden;
+}
+
+.splitter {
+  flex-shrink: 0;
+  width: 5px;
+  background: #c8bfaf;
+  cursor: col-resize;
+  transition: background 0.15s;
+}
+
+.splitter:hover,
+.splitter:active {
+  background: #8a6a40;
 }
 

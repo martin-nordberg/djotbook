@@ -18,6 +18,7 @@ interface DjotFile {
 let nextId = 1;
 
 const App: Component = () => {
+  const [splitPct, setSplitPct] = createSignal(50);
   const [files, setFiles] = createSignal<DjotFile[]>([]);
   const [activeId, setActiveId] = createSignal<number | null>(null);
   const [saving, setSaving] = createSignal(false);
@@ -161,12 +162,31 @@ const App: Component = () => {
         </For>
       </div>
 
-      <div class={styles.panels}>
+      <div class={styles.panels} style={{ '--split-left': `${splitPct()}%` }}>
         <DjotTextPanel
           path={activeFile()?.path ?? ''}
           content={activeFile()?.content ?? ''}
           onChange={updateContent}
           onEditor={(view) => { editorView = view; initScrollSync(); }}
+        />
+        <div
+          class={styles.splitter}
+          onPointerDown={(e) => {
+            const splitter = e.currentTarget;
+            splitter.setPointerCapture(e.pointerId);
+            const container = splitter.parentElement!;
+            const onMove = (ev: PointerEvent) => {
+              const rect = container.getBoundingClientRect();
+              const pct = ((ev.clientX - rect.left) / rect.width) * 100;
+              setSplitPct(Math.min(80, Math.max(20, pct)));
+            };
+            const onUp = () => {
+              splitter.removeEventListener('pointermove', onMove);
+              splitter.removeEventListener('pointerup', onUp);
+            };
+            splitter.addEventListener('pointermove', onMove);
+            splitter.addEventListener('pointerup', onUp);
+          }}
         />
         <DjotHtmlPanel
           path={activeFile()?.path ?? ''}

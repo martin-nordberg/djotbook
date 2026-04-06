@@ -1,5 +1,5 @@
 .panel {
-  flex: 1;
+  min-width: 0;
   height: 100%;
   box-sizing: border-box;
   overflow: auto;
@@ -14,15 +14,11 @@
 .panelText {
   overflow: hidden;
   padding: 0;
+  min-width: 0;
 }
 
 /* Right (preview) panel: programmatically scrolled, no visible scrollbar */
-.panel + .panel {
+.panelPreview {
   border-left: 1px solid #c8bfaf;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.panel + .panel::-webkit-scrollbar {
-  display: none;
+  overflow: hidden;
 }
