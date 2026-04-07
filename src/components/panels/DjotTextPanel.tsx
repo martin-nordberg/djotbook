@@ -73,7 +73,12 @@ const DjotTextPanel: Component<Props> = (props) => {
           ])),
           markdown(),
           EditorView.lineWrapping,
-          EditorView.theme({ '&': { height: '100%' }, '.cm-scroller': { overflow: 'auto' } }),
+          EditorView.theme({
+            '&': { height: '100%' },
+            '.cm-scroller': { overflow: 'auto' },
+            '.cm-panels': { fontSize: '1rem' },
+            '.cm-search input, .cm-search button, .cm-search label': { fontSize: '1rem' },
+          }),
           EditorView.updateListener.of((update) => {
             if (update.docChanged && !suppressChange) {
               props.onChange(update.state.doc.toString());
