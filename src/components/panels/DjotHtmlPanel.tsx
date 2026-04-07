@@ -12,8 +12,16 @@ interface Props {
 const DjotHtmlPanel: Component<Props> = (props) => {
   const html = createMemo(() => renderHTML(parse(props.content, { sourcePositions: true })));
 
+  function handleClick(e: MouseEvent) {
+    const anchor = (e.target as Element).closest('a');
+    if (anchor?.href) {
+      e.preventDefault();
+      window.open(anchor.href, '_blank', 'noreferrer');
+    }
+  }
+
   return (
-    <div class={`${styles.panel} ${styles.panelPreview} markdown-body`} ref={props.onPanelRef} innerHTML={html()} />
+    <div class={`${styles.panel} ${styles.panelPreview} markdown-body`} ref={props.onPanelRef} innerHTML={html()} onClick={handleClick} />
   );
 };
 

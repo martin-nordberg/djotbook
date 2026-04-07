@@ -41,6 +41,20 @@ function toggleWrap(view: EditorView, marker: string, markerOpen: string, marker
   return true;
 }
 
+function insertLink(view: EditorView): boolean {
+  const sel = view.state.selection.main;
+  if (sel.empty) return false;
+  const url = window.prompt('Link URL:');
+  if (!url) return true;
+  const text = view.state.sliceDoc(sel.from, sel.to);
+  const insert = `[${text}](${url})`;
+  view.dispatch({
+    changes: { from: sel.from, to: sel.to, insert },
+    selection: { anchor: sel.from + insert.length },
+  });
+  return true;
+}
+
 interface Props {
   path: string;
   content: string;
@@ -68,6 +82,11 @@ const DjotTextPanel: Component<Props> = (props) => {
             {
               key: 'Mod-i',
               run: (view) => toggleWrap(view, '_', '{_', '_}'),
+              preventDefault: true,
+            },
+            {
+              key: 'Mod-k',
+              run: insertLink,
               preventDefault: true,
             },
           ])),
