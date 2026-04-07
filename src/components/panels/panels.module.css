@@ -3,11 +3,6 @@
   height: 100%;
   box-sizing: border-box;
   overflow: auto;
-  padding: 16px;
-  color: #2c2010;
-  background: #faf6ee;
-  font-size: 0.875rem;
-  font-family: monospace;
 }
 
 /* Left (text) panel: CodeMirror manages its own scroll container */
@@ -15,10 +10,15 @@
   overflow: hidden;
   padding: 0;
   min-width: 0;
+  color: #2c2010;
+  background: #faf6ee;
+  font-size: 0.875rem;
+  font-family: monospace;
 }
 
 /* Right (preview) panel: programmatically scrolled, no visible scrollbar */
 .panelPreview {
   border-left: 1px solid #c8bfaf;
   overflow: hidden;
+  padding: 24px 32px;
 }

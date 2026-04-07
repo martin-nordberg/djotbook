@@ -19,6 +19,7 @@
     "@codemirror/lang-markdown": "^6.5.0",
     "@djot/djot": "0.3.2",
     "codemirror": "^6.0.2",
+    "github-markdown-css": "^5.9.0",
     "solid-js": "^1.9.12"
   }
 }
