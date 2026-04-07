@@ -85,7 +85,7 @@ const App: Component = () => {
     setOpenMenuOpen(false);
     try {
       const [handle] = await (window as any).showOpenFilePicker({
-        types: [{ description: 'Djot files', accept: { 'text/plain': ['.djot'] } }],
+        types: [{ description: 'Djot/Markdown files', accept: { 'text/plain': ['.djot', '.md'] } }],
         multiple: false,
       });
       await openFromHandle(handle);
